@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block contenido_base %}
+			<div class="row-fluid">				
+				<div class="span7">
+
+    <h1>Listado de recibos</h1>
+    <hr>
+    <h3>Instrucciones:</h3>
+    <div>Seleccione uno o más recibos para firmar.</div>
+					<div class="box-content">
+						<form class="form-horizontal" action="{% url 'documentos' username token %}" method="post">
+                                                       {% csrf_token %}
+							<fieldset>
+							  <div class="control-group">
+
+
+								<div class="controls">
+    {% for documento in documentos %}
+								  <label class="checkbox">
+    <input type="checkbox" id="{{ documento.id }}" name="documento" value="{{ documento.id }}">
+    {{ documento.nombre }}
+								  </label>
+								  <div style="clear:both"></div>
+    {% empty %}
+       No hay documentos para firmar.
+    {% endfor %}
+
+    
+
+								</div>
+							  </div>
+							  <div class="form-actions">
+                                                                {% if documentos.exists %}
+                                                                <button type="submit" class="btn btn-primary">Firmar</button>
+                                                                {% endif %}
+							  </div>
+							</fieldset>
+						</form>
+                                                {{ msg }}
+					</div><!-- box-content -->
+   
+
+
+
+
+					
+				
+
+
+
+	
+
+				</div>						
+			</div>
+
+{% endblock %}

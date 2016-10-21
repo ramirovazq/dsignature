@@ -1,0 +1,29 @@
+{% extends "base_admin.html" %}
+
+{% block contenido_base %}
+<h2>Resultados</h2>
+{% if pdf_no_xml %}
+<h2>Los siguintes usuarios no tienen un archivo xml asociado</h2>
+<ul>
+{% for curp in pdf_no_xml %}
+<li>{{ curp }}</li>
+{% endfor %}
+</ul>
+{% endif %}
+{% if xml_no_pdf %}
+<h2>Los siguintes usuarios no tienen un archivo pdf asociado</h2>
+<ul>
+{% for curp in xml_no_pdf %}
+<li>{{ curp }}</li>
+{% endfor %}
+</ul>
+{% endif %}
+{% if sin_curp_intranet %}
+<h2>Los siguintes curps no se encuentran en la intranet</h2>
+<ul>
+{% for curp in sin_curp_intranet %}
+<li>{{ curp }}</li>
+{% endfor %}
+</ul>
+{% endif %}
+{% endblock %}

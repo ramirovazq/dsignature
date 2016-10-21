@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cfdi:Comprobante xmlns:cfdi="http://www.sat.gob.mx/cfd/3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nomina="http://www.sat.gob.mx/nomina" total="{{ total_neto }}" LugarExpedicion="MEXICO, DF" TipoCambio="1.00" fecha="{{ fecha_emision }}" sello="{{ sello }}" Moneda="MXN" metodoDePago="03" noCertificado="{{ no_certificado }}" xsi:schemaLocation="http://www.sat.gob.mx/cfd/3 http://www.sat.gob.mx/sitio_internet/cfd/3/cfdv32.xsd http://www.sat.gob.mx/nomina http://www.sat.gob.mx/sitio_internet/cfd/nomina/nomina11.xsd" certificado="{{ certificado }}" version="3.2" serie="A" subTotal="{{ total_bruto }}" folio="{{ folio }}" tipoDeComprobante="egreso" formaDePago="PAGO EN UNA SOLA EXHIBICION"><cfdi:Emisor nombre="INSTITUTO NACIONAL DE MEDICINA GENOMICA" rfc="INM0407193Q5"><cfdi:DomicilioFiscal codigoPostal="14610" noExterior="4809" estado="DISTRITO FEDERAL" pais="México" municipio="TLALPAN" colonia="ARENAL TEPEPAN" calle="PERIFERICO SUR"/><cfdi:RegimenFiscal Regimen="Regimen General de Ley"/></cfdi:Emisor><cfdi:Receptor nombre="{{ nombre_usuario }}" rfc="{{ rfc_usuario }}"><cfdi:Domicilio pais="México"/></cfdi:Receptor><cfdi:Conceptos><cfdi:Concepto cantidad="1.0000" unidad="SERVICIO" noIdentificacion="{{ num_empleado }}" descripcion="{{ nombre_nomina }}" valorUnitario="{{ total_bruto }}" importe="{{ total_bruto }}"/></cfdi:Conceptos><cfdi:Impuestos totalImpuestosRetenidos="{{ total_impuestos_retenidos }}"><cfdi:Retenciones><cfdi:Retencion impuesto="ISR" importe="{{ total_impuestos_retenidos }}"/></cfdi:Retenciones></cfdi:Impuestos><cfdi:Complemento><nomina:Nomina Version="1.1" NumEmpleado="{{ num_empleado }}" CURP="{{ curp }}" TipoRegimen="{{ tipo_regimen }}" FechaPago="{{ fecha_pago }}" FechaInicialPago="{{ fecha_inicial_pago }}" FechaFinalPago="{{ fecha_final_pago }}" NumDiasPagados="{{ num_dias_pagados }}" Departamento="{{ departamento }}" CLABE="{{ clabe }}" Puesto="{{ puesto }}" TipoContrato="{{ tipo_contrato }}" PeriodicidadPago="{{ periodicidad_pago }}">
+<nomina:Percepciones TotalGravado="{{ percepcion_total_gravado }}" TotalExento="{{ percepcion_total_exento }}">
+{% for percepcion in percepciones %}
+<nomina:Percepcion TipoPercepcion="{{ percepcion.tipo }}" Clave="{{ percepcion.clave }}" Concepto="{{ percepcion.concepto }}" ImporteGravado="{{ percepcion.importe_gravado }}" ImporteExento="{{ percepcion.importe_exento }}"/>
+{% endfor %}
+</nomina:Percepciones>
+<nomina:Deducciones TotalGravado="{{ deduccion_total_gravado }}" TotalExento="{{ deduccion_total_exento }}">
+{% for deduccion in deducciones %}
+<nomina:Deduccion TipoDeduccion="{{ deduccion.tipo }}" Clave="{{ deduccion.clave }}" Concepto="{{ deduccion.concepto }}" ImporteGravado="{{ deduccion.importe_gravado }}" ImporteExento="{{ deduccion.importe_exento }}"/>
+{% endfor %}
+</nomina:Deducciones>
+</nomina:Nomina>
+</cfdi:Complemento>
+</cfdi:Comprobante>

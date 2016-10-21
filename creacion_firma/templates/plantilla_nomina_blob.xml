@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PaqueteNomina id="{{ paquete_id }}" totalregs="{{ total_regs }}" xmlns="http://www.sat.gob.mx/Nomina/Paquete">
+    {% for comprobante in comprobantes %}
+    <ControlComprobante Num="{{ forloop.counter }}" id="{{ comprobante.id }}">
+        <xmlComp>
+            <![CDATA[{{ comprobante.xml|safe }}]]>
+        </xmlComp>
+    </ControlComprobante>
+    {% endfor %}
+</PaqueteNomina>

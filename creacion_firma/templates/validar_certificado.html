@@ -1,0 +1,20 @@
+{% extends "base_admin.html" %}
+
+{% block contenido_base %}
+<h2>Formulario para la firma de petición de certificado.</h2>
+<h3>Instrucciones:</h3>
+<ol>
+<li>Suba el archivo .req del usuario para convertirlo a un certificado válido.</li>
+</ol>
+<hr>
+<form action="{% url 'firmar_csr' %}" method="post" enctype="multipart/form-data">
+{% csrf_token %}
+<table style="width:400px;text-align:left;margin:auto;">
+<tr>
+{{ form.as_table }}
+<td colspan="2" style="text-align:right;"><button type="submit">Firmar</button></td>
+</tr>
+</table>
+</form>
+<div>{{ msg }}</div>
+{% endblock %}

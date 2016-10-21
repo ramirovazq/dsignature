@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block contenido_base %}
+<h2>Formulario para la firma de documentos</h2>
+<h3>Instrucciones:</h3>
+<ol>
+<li>Escriba la contraseña asociada a la llave privada de su fiel.</li>
+<li>Suba el archivo .key donde dice llave privada.</li>
+<li>Apriete el botón firmar.</li>
+</ol>
+<hr>
+<form action="." method="post" enctype="multipart/form-data">
+{% csrf_token %}
+<table style="width:400px;text-align:left;margin:auto;">
+<tr>
+<td style="text-align:right;">Contraseña: </td><td><input type="password" name="pass"></td>
+</tr>
+<tr>
+<td style="text-align:right;">Certificado: </td><td><input type="file" name="cer"></td>
+</tr>
+<tr>
+<td style="text-align:right;">Llave privada: </td><td><input type="file" name="key"></td>
+</tr>
+<tr>
+<td colspan="2" style="text-align:right;"><button type="submit">Firmar</button></td>
+</tr>
+</table>
+</form>
+<div style="color: red; font-size:120%">{{ msg }}</div>
+{% endblock %}

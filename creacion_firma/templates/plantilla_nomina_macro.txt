@@ -1,0 +1,89 @@
+VERSION BUILD=9030808 RECORDER=FX
+TAB T=1
+
+TAG POS=1 TYPE=INPUT:TEXT FORM=ID:frmReceptor ATTR=ID:cfdi:Receptor_@rfc CONTENT={{ rfc_usuario }}
+TAG POS=1 TYPE=INPUT:TEXT FORM=ID:frmReceptor ATTR=ID:cfdi:Receptor_@nombre CONTENT={{ nombre_usuario|safe }}
+TAG POS=2 TYPE=INPUT:BUTTON FORM=ID:frmReceptor ATTR=*
+WAIT SECONDS=5
+
+TAG POS=1 TYPE=INPUT:TEXT FORM=ID:form ATTR=ID:cfdi:Comprobante_@LugarExpedicion CONTENT=Ciudad<SP>de<SP>México
+
+TAG POS=1 TYPE=INPUT:TEXT FORM=ID:form ATTR=ID:cfdi:Comprobante_@serie CONTENT=A
+TAG POS=1 TYPE=INPUT:TEXT FORM=ID:form ATTR=ID:cfdi:Comprobante_@folio CONTENT={{ folio }}
+TAG POS=1 TYPE=INPUT:TEXT FORM=ID:form ATTR=ID:cfdi:Comprobante_@Moneda CONTENT=MXN
+TAG POS=1 TYPE=INPUT:TEXT FORM=ID:form ATTR=ID:cfdi:Comprobante_@TipoCambio CONTENT=1.0
+TAG POS=1 TYPE=INPUT:TEXT FORM=ID:form ATTR=ID:cfdi:Comprobante_@formaDePago CONTENT=PAGO<SP>EN<SP>UNA<SP>SOLA<SP>EXHIBICION
+TAG POS=1 TYPE=INPUT:TEXT FORM=ID:form ATTR=ID:cfdi:Comprobante_@metodoDePago CONTENT=TRANSFERENCIA
+TAG POS=1 TYPE=A ATTR=CLASS:sbSelector
+TAG POS=1 TYPE=A ATTR=TXT:Egreso
+
+' SE INSERTA EL CONCEPTO DE SERVICIO
+TAG POS=1 TYPE=INPUT:TEXT FORM=ID:form ATTR=ID:ItemConcepto_Cantidad CONTENT=1
+TAG POS=1 TYPE=INPUT:TEXT FORM=ID:form ATTR=ID:ItemConcepto_Unidad CONTENT=SERVICIO
+TAG POS=1 TYPE=INPUT:TEXT FORM=ID:form ATTR=ID:ItemConcepto_NoId CONTENT={{ num_empleado }}
+TAG POS=1 TYPE=INPUT:TEXT FORM=ID:form ATTR=ID:ItemConcepto_Descripcion CONTENT={{ nombre_nomina|safe }}
+TAG POS=1 TYPE=INPUT:TEXT FORM=ID:form ATTR=ID:ItemConcepto_PrecioUnitario CONTENT={{ total_bruto }}
+TAG POS=1 TYPE=INPUT:BUTTON FORM=ID:form ATTR=ID:btnAddConcepto
+
+' codigo para ISR
+TAG POS=1 TYPE=INPUT:CHECKBOX FORM=ID:form ATTR=ID:IsEnabledImpuestoRetenido CONTENT=YES
+TAG POS=2 TYPE=A ATTR=CLASS:sbSelector
+TAG POS=1 TYPE=A ATTR=TXT:ISR
+TAG POS=1 TYPE=INPUT:TEXT FORM=ID:form ATTR=ID:ItemRetencion_Importe CONTENT={{ total_impuestos_retenidos }}
+TAG POS=1 TYPE=INPUT:BUTTON FORM=ID:form ATTR=ID:btnRetencion
+
+' Complemento de nomina
+TAG POS=1 TYPE=INPUT:CHECKBOX FORM=ID:form ATTR=ID:IsEnabledNomina CONTENT=YES
+TAG POS=1 TYPE=INPUT:TEXT FORM=ID:form ATTR=ID:nomina:Nomina_@NumEmpleado CONTENT={{ num_empleado }}
+TAG POS=1 TYPE=INPUT:TEXT FORM=ID:form ATTR=ID:nomina:Nomina_@CURP CONTENT={{ curp }}
+TAG POS=1 TYPE=INPUT:TEXT FORM=ID:form ATTR=ID:nomina:Nomina_@Departamento CONTENT={{ departamento|safe }}
+TAG POS=1 TYPE=INPUT:TEXT FORM=ID:form ATTR=ID:nomina:Nomina_@PUESTO CONTENT={{ puesto|safe }}
+WAIT SECONDS=2
+' CUIDAR QUE LA CUENTA CLABE NO EMPIEZE EN cero
+TAG POS=1 TYPE=INPUT:TEXT FORM=ID:form ATTR=ID:nomina:Nomina_@CLABE CONTENT={{ clabe }}
+TAG POS=1 TYPE=INPUT:TEXT FORM=ID:form ATTR=ID:nomina:Nomina_@FechaPago CONTENT={{ fecha_pago }}
+TAG POS=1 TYPE=INPUT:TEXT FORM=ID:form ATTR=ID:nomina:Nomina_@PeriodicidadPago CONTENT={{ periodicidad_pago }}
+TAG POS=1 TYPE=INPUT:TEXT FORM=ID:form ATTR=ID:nomina:Nomina_@FechaInicialPago CONTENT={{ fecha_inicial_pago }}
+TAG POS=1 TYPE=INPUT:TEXT FORM=ID:form ATTR=ID:nomina:Nomina_@FechaFinalPago CONTENT={{ fecha_final_pago }}
+TAG POS=1 TYPE=INPUT:TEXT FORM=ID:form ATTR=ID:nomina:Nomina_@NumDiasPagados CONTENT={{ num_dias_pagados }}
+TAG POS=1 TYPE=INPUT:TEXT FORM=ID:form ATTR=ID:nomina:Nomina_@TipoContrato CONTENT={{ tipo_contrato }}
+'TAG POS=1 TYPE=INPUT:TEXT FORM=ID:form ATTR=ID:nomina:Nomina_@TipoRegimen CONTENT={{ tipo_regimen }}
+TAG POS=5 TYPE=A ATTR=CLASS:sbSelector
+TAG POS=1 TYPE=A ATTR=TXT:Sueldos<SP>y<SP>salarios
+
+' Se seleccionan las PERCEPCIONES
+TAG POS=1 TYPE=INPUT:CHECKBOX FORM=ID:form ATTR=ID:IsEnabledPercepciones CONTENT=YES
+
+' PERCEPCIONES
+{% for percepcion in percepciones %}
+TAG POS=7 TYPE=A ATTR=CLASS:sbSelector
+TAG POS=1 TYPE=A ATTR=TXT:028<SP>Comisiones
+TAG POS=1 TYPE=A ATTR=TXT:{{ percepcion.tipo_text|safe }}
+TAG POS=1 TYPE=INPUT:TEXT FORM=ID:form ATTR=ID:ItemClave_Percepcion CONTENT={{ percepcion.clave }}
+TAG POS=1 TYPE=INPUT:TEXT FORM=ID:form ATTR=ID:ItemConcepto_Percepcion CONTENT={{ percepcion.concepto|safe }}
+TAG POS=1 TYPE=INPUT:TEXT FORM=ID:form ATTR=ID:ItemImporteGravado_Percepcion CONTENT={{ percepcion.importe_gravado }}
+TAG POS=1 TYPE=INPUT:TEXT FORM=ID:form ATTR=ID:ItemImporteExento_Percepcion CONTENT={{ percepcion.importe_exento }}
+TAG POS=1 TYPE=INPUT:BUTTON FORM=ID:form ATTR=ID:btnPercepcion
+WAIT SECONDS=1
+{% endfor %}
+
+' Se seleccionan las DEDUCCIONES
+TAG POS=1 TYPE=INPUT:CHECKBOX FORM=ID:form ATTR=ID:IsEnabledDeducciones CONTENT=YES
+
+WAIT SECONDS=1
+
+' DEDUCCIONES
+{% for deduccion in deducciones %}
+TAG POS=8 TYPE=A ATTR=CLASS:sbSelector
+TAG POS=1 TYPE=A ATTR=TXT:014<SP>Errores
+TAG POS=1 TYPE=A ATTR=TXT:{{ deduccion.tipo_text|safe }}
+TAG POS=1 TYPE=INPUT:TEXT FORM=ID:form ATTR=ID:ItemClave_Deduccion CONTENT={{ deduccion.clave }}
+TAG POS=1 TYPE=INPUT:TEXT FORM=ID:form ATTR=ID:ItemConcepto_Deduccion CONTENT={{ deduccion.concepto|safe }}
+TAG POS=1 TYPE=INPUT:TEXT FORM=ID:form ATTR=ID:ItemImporteGravado_Deduccion CONTENT={{ deduccion.importe_gravado }}
+TAG POS=1 TYPE=INPUT:TEXT FORM=ID:form ATTR=ID:ItemImporteExento_Deduccion CONTENT={{ deduccion.importe_exento }}
+TAG POS=1 TYPE=INPUT:BUTTON FORM=ID:form ATTR=ID:btnDeduccion
+WAIT SECONDS=1
+{% endfor %}
+
+' SE REESCRIBE EL TOTAL DEL CONTENIDO DEL SERVICIO
+TAG POS=1 TYPE=INPUT:TEXT FORM=ID:form ATTR=ID:total CONTENT=${{ total_neto }}

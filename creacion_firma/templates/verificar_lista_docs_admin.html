@@ -1,0 +1,16 @@
+{% extends "base_admin.html" %}
+
+{% block contenido_base %}
+<h2>Documentos firmados por {{ username }}</h2>
+<hr>
+
+<table style="margin: auto; min-width:400px;">
+{% for doc in documentos %}
+<tr>
+<td>
+<a href="{% url 'verificar_firma_doc' username doc.id %}">{{ doc.nombre }}</a></td>
+<td>{{ doc.fecha }}</td>
+</tr>
+{% endfor %}
+</table>
+{% endblock %}

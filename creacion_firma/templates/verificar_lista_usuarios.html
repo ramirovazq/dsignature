@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block contenido_base %}
+<h2>Ver usuarios.</h2>
+<form action="." method="POST">
+{% csrf_token %}
+{{ firmado_form.as_p }}
+{{ select_year.as_p }}
+{{ nominas_form.as_p }}
+<button type="send">Ver</button>
+</form>
+
+{% if tipo == "f" %}
+{% for user_document_sign in users_document_sign %}
+<li>
+<a href="{% url 'verificar_firma_doc_admin' user_document_sign.user.username user_document_sign.id %}">
+    {{ user_document_sign.user.username }}
+</a>
+</li>
+{% endfor %}
+{% else %}
+{% for user_document_sign in users_document_sign %}
+<li>{{ user_document_sign.user.username }}</li>
+{% endfor %}
+{% endif %}
+
+{% endblock %}

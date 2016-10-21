@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block contenido_base %}
+<div class="row-fluid">				
+<div class="span7">
+<h1>Documentos firmados por {{ username }}</h1>
+<hr>
+<form action="." method="POST">
+{% csrf_token %}
+{{ select_year.as_p }}
+<button type="send">Ver</button>
+</form>
+<table style="margin: auto; min-width:400px;" class="table table-striped table-bordered">
+	<thead>
+		<tr>
+		    <th>Numero de quincena</th>
+		    <th>Descargas</th>
+        </tr>
+    </thead>  
+    <tbody>
+	{% for doc in documentos %}
+	<tr>
+        <td><a href="{% url 'verificar_firma_doc' username doc.id %}">{{ doc.nombre }}</a></td>
+		<td>
+            <a href="{% url 'bajar_archivo' doc.id 'pdf' %}" class="btn btn-info">
+			<i class="material-icons">picture_as_pdf</i> 
+		    </a>
+            <a href="{% url 'bajar_archivo' doc.id 'xml' %}" class="btn btn-info">
+			<i class="material-icons">insert_drive_file</i> 
+		    </a>
+            <a href="{% url 'bajar_archivo' doc.id 'pkcs7' %}" class="btn btn-info">
+			<i class="material-icons">lock</i>
+            </a>
+		</td>
+	</tr>
+	{% endfor %}
+    </tbody>
+</table>
+</div>
+</div>
+{% endblock %}
