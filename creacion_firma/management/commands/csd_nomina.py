@@ -4,6 +4,7 @@ from creacion_firma.utils import convert_nomina2xml
 
 import os
 import codecs
+import datetime
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
@@ -14,11 +15,14 @@ class Command(BaseCommand):
                 default="macro",
                 help='construye el archivo para la macro o xml')
         parser.add_argument('--file',
-                default="macro",
-                help='construye el archivo para la macro o xml')
+                help='path donde se encuentra el archivo de excel con la nomina')
         parser.add_argument('--name',
-                default="macro",
-                help='construye el archivo para la macro o xml')
+                help='nombre de la quincena')
+        parser.add_argument('--fecha-pago',
+                help='la fecha de pago en formato YYYY-MM-DD')
+        parser.add_argument('--periodicidad',
+                default="QUINCENAL",
+                help='la periodicidad del pago')
 
     def handle(self, *args, **options):
         password = options.get('password', "")
@@ -38,13 +42,16 @@ class Command(BaseCommand):
             key = "/home/agmartinez/Descargas/Cert_Sellos/CSD01_AAA010101AAA.key"
             name_r = name
 
-        xmls = convert_nomina2xml(path, name_r, cer, key, password, "2016-08-09", f_type=f_type)
+        xmls = convert_nomina2xml(path, name_r, cer, key, password, options.get('fecha_pago', ""), f_type=f_type, periodicidad=options.get('periodicidad', "QUINCENAL"))
         url = "/tmp/{}/".format(name)
         if not os.path.exists(url):
             os.makedirs(url)
 
+        #counter = 1
         for rfc, xml in xmls:
             with codecs.open(os.path.join(url, "{}.{}".format(rfc, types[f_type])), "wb", "utf-8") as f:
                 f.write(xml)
-            #break
+        #    if counter == 2:
+        #        break
+        #    counter += 1
 

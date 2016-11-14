@@ -16,26 +16,44 @@ class Command(BaseCommand):
         parser.add_argument('--password',
                 default=None,
                 help='password')
+        parser.add_argument('--file',
+                help='path donde se encuentra el archivo de excel con la nomina')
+        parser.add_argument('--name',
+                help='nombre de la quincena')
+        parser.add_argument('--fecha-pago',
+                help='la fecha de pago en formato YYYY-MM-DD')
+        parser.add_argument('--periodicidad',
+                default="QUINCENAL",
+                help='la periodicidad del pago')
+        parser.add_argument('--write',
+                default=None,
+                action='store_true',
+                help='escribe el blob em el disco')
 
     def handle(self, *args, **options):
-        password = options.get('password', "")
-        buffer_bytes = self.create_zip(self.convert_nomina_to_xml(password))
-        blob_uri = self.send_data_to_blob(buffer_bytes, "test123"))
-        #print(self.send_data_to_blob("", "test123"))
-        #self.get_data_from_blob("test123")
+        if options.get("write", False):
+            buffer_bytes = self.create_zip(self.convert_nomina_to_xml(options))
+            self.write(buffer_bytes)
+        else:
+            buffer_bytes = self.create_zip(self.convert_nomina_to_xml(options))
+            #blob_uri = self.send_data_to_blob_cloud(buffer_bytes, "test123"))
+            #print(blob_uri)
+            #self.get_data_from_blob_cloud("test123")
 
     def get_blob_meta(self, blob_name):
         blob_service = BlockBlobService(account_name=ACCOUNT_NAME, sas_token=SAS_TOKEN)
         return blob_service.get_blob_metadata(CONTAINER_NAME, blob_name)
 
-    def convert_nomina_to_xml(self, password):
-        path = "/home/agmartinez/Programas/firma_electronica/nomina10.xls"
+    def convert_nomina_to_xml(self, options):
+        password = options.get('password', "")
+        path = options.get('file', "")
         cer = "/home/agmartinez/csd_test/Cert_Sellos/Cert_Sellos/aaa010101aaa_FIEL.cer"
         key = "/home/agmartinez/csd_test/Cert_Sellos/Cert_Sellos/AAA010101AAA_FIEL.key"
-        comprobantes = convert_nomina2xml(path, "QNA 10 ORD 2016", cer, key, password, "2016-06-07")
-        xml = comprobantes2xml(comprobantes, limit=2)
-        #with codecs.open("/home/agmartinez/Escritorio/01.xml", "w", "utf8") as f:
-        #    f.write(xml)
+        #comprobantes = convert_nomina2xml(path, "QNA 10 ORD 2016", cer, key, password, "2016-06-07")
+        comprobantes = convert_nomina2xml(path, options.get('name', ""), cer, key, password, 
+            options.get('fecha_pago', ""), f_type="xml", 
+            periodicidad=options.get('periodicidad', "QUINCENAL"))
+        xml = comprobantes2xml(comprobantes, limit=10)
         return xml
 
     def create_zip(self, data):
@@ -49,7 +67,7 @@ class Command(BaseCommand):
         buffer_bytes.seek(0)
         return buffer_bytes
 
-    def send_data_to_blob(self, data, blob_name):
+    def send_data_to_blob_cloud(self, data, blob_name):
         from azure.storage.blob.baseblobservice import _get_path
         blob_service = BlockBlobService(account_name=ACCOUNT_NAME, sas_token=SAS_TOKEN)
         blob_service.create_blob_from_stream(CONTAINER_NAME, blob_name, data, 
@@ -61,7 +79,7 @@ class Command(BaseCommand):
             blob_service._get_host(),
             _get_path(CONTAINER_NAME, blob_name))
 
-    def get_data_from_blob(self, blob_name):
+    def get_data_from_blob_cloud(self, blob_name):
         blob_service = BlockBlobService(account_name=ACCOUNT_NAME, sas_token=SAS_TOKEN)
         blob_service.get_blob_to_path(CONTAINER_NAME, blob_name, "/home/agmartinez/Escritorio/blob.zip")
 
