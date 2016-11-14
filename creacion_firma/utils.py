@@ -314,8 +314,10 @@ def convert_nomina2xml(excel_path, name, cer, key, password, fecha_pago, periodi
         conceptos = {c: c.replace(" ", "<SP>") for c in columns}
         catalogo_percepciones = {k: v.replace(" ", "<SP>") for k, v in catalogo_percepciones.items()}
         catalogo_deducciones = {k: v.replace(" ", "<SP>") for k, v in catalogo_deducciones.items()}
+        convert_name_fn = lambda x: x.replace(" ", "<SP>")
     else:
         conceptos = {c: c for c in columns}
+        convert_name_fn = lambda x: x
 
     claves = [row for index, row in df[1:2].iterrows()][0]
     tipo = [row for index, row in df[0:1].iterrows()][0]
@@ -325,7 +327,7 @@ def convert_nomina2xml(excel_path, name, cer, key, password, fecha_pago, periodi
         percepciones_column = True
         for column in columns:
             if percepciones_column is True and len(claves[column]) > 0 and claves[column] != "Total":
-                if row[column] > 0:
+                if row[column] != 0:
                     user_xml_data.add_percepciones({"clave": claves[column], 
                         "concepto": conceptos[column], "importe_gravado": row[column], 
                         "importe_exento": 0.000000, "tipo": str(tipo[column]).zfill(3), 
@@ -333,7 +335,7 @@ def convert_nomina2xml(excel_path, name, cer, key, password, fecha_pago, periodi
             elif claves[column] == "Total":
                 percepciones_column = False
             elif len(claves[column]) > 0 and claves[column] != "Total":
-                if row[column] > 0:
+                if row[column] != 0:
                     user_xml_data.add_deducciones({"clave": claves[column], 
                         "concepto": conceptos[column], "importe_gravado": row[column], 
                         "importe_exento": 0.000000, "tipo": str(tipo[column]).zfill(3),
@@ -362,7 +364,7 @@ def convert_nomina2xml(excel_path, name, cer, key, password, fecha_pago, periodi
         user_xml_data.add("percepcion_total_gravado", total_percepciones)
         user_xml_data.transform_date()
         print(user_xml_data.data_template["nombre_usuario"], folio)
-        user_xml_data.data_template["nombre_usuario"] = user_xml_data.data_template["nombre_usuario"] .replace(" ", "<SP>")
+        user_xml_data.data_template["nombre_usuario"] = convert_name_fn(user_xml_data.data_template["nombre_usuario"])
         if total_neto != round(row["Neto a Pagar"], 2):
             print("PERCEPCIONES", total_percepciones, "DEDUCCIONES", total_deducciones)
             print("ERROR AL COMPARAR EL TOTAL CON EL NETO")
