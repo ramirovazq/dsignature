@@ -139,8 +139,8 @@ def firmar(request, username):
 @login_required(login_url='/login/')
 def verificar_lista_usuarios(request):
     from creacion_firma.forms import SelectYearForm, NominasFilterYear, FirmaOSinForm
-    token = request.session.get("token", '')
-    username = request.session.get("username", '')
+    token = request.session.get("token", '123')
+    username = request.session.get("username", '123')
     today = datetime.date.today()
     nomina = None
     if request.method == "POST":
@@ -173,14 +173,14 @@ def verificar_lista_usuarios(request):
                 xml_pkcs7__isnull=False).exclude(xml_pkcs7='').order_by("user__username")
     else:
         users_document_sign = None
+    
     return render(request, "verificar_lista_usuarios.html", {
         "users_document_sign": users_document_sign,
         "username": username,
         "token": token,
         "firmado_form": firmado_form,
         "select_year": select_year,
-        "nominas_form": nominas_form,
-        "tipo": tipo})
+        "nominas_form": nominas_form})
 
 
 def verificar_docs_firmados(request, username):
@@ -219,13 +219,18 @@ def verificar_docs_firmados_admin(request, username):
 
 def documentos_check(documento, username, token):
     cer_pem = tmp_dir_o_file+id_generator(size=SIZE_NAME)
-    save_file(cer_pem, StringFileWrapper(documento.certificado.pem))
-    digital_sign = DigitalSign(cer_pem=cer_pem)
-    digital_sign.set_pkcs7(documento.xml_pkcs7.url)
-    pkcs7_valid = digital_sign.verify(documento.xml.url)
-    data_info = digital_sign.get_info_cer(file_type="pem")
-    digital_sign.clean()
-    clean([cer_pem])
+    if documento.certificado is not None:
+        save_file(cer_pem, StringFileWrapper(documento.certificado.pem))
+        digital_sign = DigitalSign(cer_pem=cer_pem)
+        digital_sign.set_pkcs7(documento.xml_pkcs7.url)
+        pkcs7_valid = digital_sign.verify(documento.xml.url)
+        data_info = digital_sign.get_info_cer(file_type="pem")
+        digital_sign.clean()
+        clean([cer_pem])
+    else:
+        data_info = None
+        pkcs7_valid = None
+
     return {
         "cert": data_info, 
         "username": username,
@@ -236,7 +241,7 @@ def documentos_check(documento, username, token):
 
 @login_required(login_url='/login/')
 def verificar_firma_doc_admin(request, username, doc_id):
-    token = request.session.get("token", '')
+    token = request.session.get("token", '123')
     documento = UserDocumentSign.objects.get(user__username=username, id=doc_id)
     data = documentos_check(documento, username, token)
     return render(request, "verificar_firma.html", data)
@@ -319,8 +324,9 @@ def login(request):
                 password=form.cleaned_data["password"])
             if not user is None and user.is_active:
                 login(request, user)
-                return HttpResponseRedirect(reverse('subir_nomina'))
+                return HttpResponseRedirect(request.session.get('url', '/verificar/'))
     else:
+        request.session['url'] = request.GET.get('next', '/verificar/')
         form = LoginForm()
 
     return render(request, "login.html", {"form": form})
@@ -508,7 +514,7 @@ def subir_nomina(request):
 
 
 def bajar_archivo(request, doc_id, type_doc):
-    if request.user.is_superuser:
+    if request.user.is_superuser or request.user.is_staff:
         documento = UserDocumentSign.objects.get(id=doc_id)
     else:
         token = request.session.get("token", '')

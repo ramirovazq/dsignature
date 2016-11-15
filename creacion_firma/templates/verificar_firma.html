@@ -2,7 +2,26 @@
 
 {% block contenido_base %}
 {% if cert == None %}
-	<div>No tiene datos a mostrar el certificado.</div>
+	<div>No se tienen datos en el certificado.</div>
+    <table class="table table-striped table-bordered bootstrap-datatable">
+    <thead>
+        <tr>
+           <th>Tipo</th>
+           <th>Descarga</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>[PDF]</td>
+            <td>
+                <a href="{% url 'bajar_archivo' documento.id 'pdf' %}" class="btn btn-info">
+                <i class="material-icons">file_dowload</i>
+                <i class="material-icons">picture_as_pdf</i>
+                </a>
+            </td>
+        </tr>
+    </tbody>
+    </table>
 {% else %}
 <h2>{{ documento.nombre }}</h2>
 <table class="table table-striped table-bordered bootstrap-datatable">
