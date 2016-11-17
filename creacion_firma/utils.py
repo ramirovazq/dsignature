@@ -358,7 +358,11 @@ def convert_nomina2xml(excel_path, name, cer, key, password, fecha_pago, periodi
         user_xml_data.add("total_bruto", total_percepciones)
         user_xml_data.add("total_neto", total_neto)
         deducciones = user_xml_data.deducciones()
-        user_xml_data.add("total_impuestos_retenidos", deducciones["001a"]["importe_gravado"]) #ISR
+        try:
+            isr = deducciones["001a"]["importe_gravado"]
+        except KeyError:
+            isr = 0
+        user_xml_data.add("total_impuestos_retenidos", isr) #ISR
         user_xml_data.add("deduccion_total_exento", round(total_deducciones, 2))
         user_xml_data.add("periodicidad_pago", periodicidad)
         user_xml_data.add("percepcion_total_gravado", total_percepciones)

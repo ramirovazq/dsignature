@@ -78,7 +78,7 @@ def pdf(comprobante, total, emisor, receptor, conceptos, timbrado, nomina):
         canvas.line(330, 677-diferencia+extra, 580, 677-diferencia+extra)
 
         canvas.drawString(30, 660-diferencia+extra, "CLABE:")
-        canvas.drawString(160, 660-diferencia+extra, nomina["@CLABE"])
+        canvas.drawString(160, 660-diferencia+extra, nomina.get("@CLABE", "SIN CLABE"))
         canvas.line(160, 657-diferencia+extra, 580, 657-diferencia+extra)
 
         canvas.drawString(30, 640-diferencia+extra, "Denominación del puesto:")
@@ -172,12 +172,20 @@ def pdf(comprobante, total, emisor, receptor, conceptos, timbrado, nomina):
     p_money.textColor = 'black'
 
     percepciones_data = []
+    if not isinstance(percepciones["nomina:Percepcion"], list):
+        percepciones["nomina:Percepcion"] = [percepciones["nomina:Percepcion"]]
+
+    print(type(percepciones["nomina:Percepcion"]))
     for p in percepciones["nomina:Percepcion"]:
         percepciones_data.append([
             Paragraph(p["@Clave"]+"  "+p["@Concepto"], p_text),
             Paragraph("${:,.2f}".format(float(p["@ImporteGravado"])), p_money)])
 
     deducciones_data = []
+    if not isinstance(deducciones["nomina:Deduccion"], list):
+        deducciones["nomina:Deduccion"] = [deducciones["nomina:Deduccion"]]
+
+    print(deducciones["nomina:Deduccion"])
     for p in deducciones["nomina:Deduccion"]:
         importe_exento = float(p["@ImporteExento"])
         importe_gravado = float(p["@ImporteGravado"])
