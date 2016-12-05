@@ -23,6 +23,7 @@ class Command(BaseCommand):
         parser.add_argument('--periodicidad',
                 default="QUINCENAL",
                 help='la periodicidad del pago')
+        parser.add_argument('--max', default=None)
 
     def handle(self, *args, **options):
         password = options.get('password', "")
@@ -30,6 +31,7 @@ class Command(BaseCommand):
         f_type = options.get('type', "")
         name = options.get('name', "") #"QNA 14 ORD 2016"
         types = {"macro": "iim", "xml": "xml"}
+        max_elems = options.get('max', None)
 
         if f_type == "macro":
             cer = ""
@@ -38,8 +40,10 @@ class Command(BaseCommand):
         else:            
             #cer = "/home/agmartinez/csd_test/Cert_Sellos/Cert_Sellos/aaa010101aaa_FIEL.cer"
             #key = "/home/agmartinez/csd_test/Cert_Sellos/Cert_Sellos/AAA010101AAA_FIEL.key"
-            cer = "/home/agmartinez/Descargas/Cert_Sellos/CSD01_AAA010101AAA.cer"
-            key = "/home/agmartinez/Descargas/Cert_Sellos/CSD01_AAA010101AAA.key"
+            #cer = "/home/agmartinez/Descargas/Cert_Sellos/CSD01_AAA010101AAA.cer"
+            #key = "/home/agmartinez/Descargas/Cert_Sellos/CSD01_AAA010101AAA.key"
+            cer = "/home/agmartinez/Timbrado INMEGEN/Datos_Prueba_WS-Nomina_INMEGEN/CSD_AIS8012085L7/CSD_Pruebas_AIS8012085L7.cer"
+            key = "/home/agmartinez/Timbrado INMEGEN/Datos_Prueba_WS-Nomina_INMEGEN/CSD_AIS8012085L7/CSD_Pruebas_AIS8012085L7.key"
             name_r = name
 
         xmls = convert_nomina2xml(path, name_r, cer, key, password, options.get('fecha_pago', ""), f_type=f_type, periodicidad=options.get('periodicidad', "QUINCENAL"))
@@ -47,11 +51,11 @@ class Command(BaseCommand):
         if not os.path.exists(url):
             os.makedirs(url)
 
-        #counter = 1
+        counter = 0
         for rfc, xml in xmls:
             with codecs.open(os.path.join(url, "{}.{}".format(rfc, types[f_type])), "wb", "utf-8") as f:
                 f.write(xml)
-        #    if counter == 2:
-        #        break
-        #    counter += 1
+            if max_elems is not None and counter == int(max_elems):
+                break
+            counter += 1
 

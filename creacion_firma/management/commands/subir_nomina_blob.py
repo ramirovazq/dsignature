@@ -29,6 +29,7 @@ class Command(BaseCommand):
                 default=None,
                 action='store_true',
                 help='escribe el blob em el disco')
+        parser.add_argument('--max', default='0')
 
     def handle(self, *args, **options):
         if options.get("write", False):
@@ -36,9 +37,9 @@ class Command(BaseCommand):
             self.write(buffer_bytes)
         else:
             buffer_bytes = self.create_zip(self.convert_nomina_to_xml(options))
-            #blob_uri = self.send_data_to_blob_cloud(buffer_bytes, "test123"))
-            #print(blob_uri)
-            #self.get_data_from_blob_cloud("test123")
+            blob_uri = self.send_data_to_blob_cloud(buffer_bytes, "prueba_nomina_cfdi")
+            print(blob_uri)
+            self.get_data_from_blob_cloud("prueba_nomina_cfdi")
 
     def get_blob_meta(self, blob_name):
         blob_service = BlockBlobService(account_name=ACCOUNT_NAME, sas_token=SAS_TOKEN)
@@ -47,13 +48,14 @@ class Command(BaseCommand):
     def convert_nomina_to_xml(self, options):
         password = options.get('password', "")
         path = options.get('file', "")
-        cer = "/home/agmartinez/csd_test/Cert_Sellos/Cert_Sellos/aaa010101aaa_FIEL.cer"
-        key = "/home/agmartinez/csd_test/Cert_Sellos/Cert_Sellos/AAA010101AAA_FIEL.key"
-        #comprobantes = convert_nomina2xml(path, "QNA 10 ORD 2016", cer, key, password, "2016-06-07")
+        #cer = "/home/agmartinez/csd_test/Cert_Sellos/Cert_Sellos/aaa010101aaa_FIEL.cer"
+        #key = "/home/agmartinez/csd_test/Cert_Sellos/Cert_Sellos/AAA010101AAA_FIEL.key"
+        cer = "/home/agmartinez/Timbrado INMEGEN/Datos_Prueba_WS-Nomina_INMEGEN/CSD_AIS8012085L7/CSD_Pruebas_AIS8012085L7.cer"
+        key = "/home/agmartinez/Timbrado INMEGEN/Datos_Prueba_WS-Nomina_INMEGEN/CSD_AIS8012085L7/CSD_Pruebas_AIS8012085L7.key"
         comprobantes = convert_nomina2xml(path, options.get('name', ""), cer, key, password, 
             options.get('fecha_pago', ""), f_type="xml", 
             periodicidad=options.get('periodicidad', "QUINCENAL"))
-        xml = comprobantes2xml(comprobantes, limit=10)
+        xml = comprobantes2xml(comprobantes, limit=int(options.get("max", "0")))
         return xml
 
     def create_zip(self, data):
