@@ -175,7 +175,7 @@ def pdf(comprobante, total, emisor, receptor, conceptos, timbrado, nomina):
     if not isinstance(percepciones["nomina:Percepcion"], list):
         percepciones["nomina:Percepcion"] = [percepciones["nomina:Percepcion"]]
 
-    print(type(percepciones["nomina:Percepcion"]))
+    #print(percepciones["nomina:Percepcion"])
     for p in percepciones["nomina:Percepcion"]:
         percepciones_data.append([
             Paragraph(p["@Clave"]+"  "+p["@Concepto"], p_text),
@@ -185,7 +185,7 @@ def pdf(comprobante, total, emisor, receptor, conceptos, timbrado, nomina):
     if not isinstance(deducciones["nomina:Deduccion"], list):
         deducciones["nomina:Deduccion"] = [deducciones["nomina:Deduccion"]]
 
-    print(deducciones["nomina:Deduccion"])
+    #print(deducciones["nomina:Deduccion"])
     for p in deducciones["nomina:Deduccion"]:
         importe_exento = float(p["@ImporteExento"])
         importe_gravado = float(p["@ImporteGravado"])
@@ -200,8 +200,8 @@ def pdf(comprobante, total, emisor, receptor, conceptos, timbrado, nomina):
                 Paragraph("", p_text),
                 Paragraph("", p_text)])
     elif len(deducciones_data) < len(percepciones_data):
-        for e in range(len(deducciones_data) - len(percepciones_data)):
-            percepciones_data.append([
+        for e in range(len(percepciones_data) - len(deducciones_data)):
+            deducciones_data.append([
                 Paragraph("", p_text),
                 Paragraph("", p_text)])
 
