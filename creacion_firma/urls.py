@@ -26,4 +26,6 @@ urlpatterns = [
     url(r'^resultados_subir_nomina/$', creacion_firma.resultados_subir_nomina, 
         name="resultados_subir_nomina"), 
     url(r'^login/$', creacion_firma.login, name="login"),
+
+    url(r'^test_rest/$', creacion_firma.test_rest, name="test_rest"),
 ]
