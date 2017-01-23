@@ -156,7 +156,7 @@ def save_file(filename, data):
 def convert_str2date(date_text):
     dict_ = {"jan": "01", "feb": "02", "mar": "03", "apr": "04", "may": "05", 
     "jun": "06", "jul": "07", "aug": "08", "sep": "09", "oct": "10",
-    "nov": "11", "dic": "12"}
+    "nov": "11", "dec": "12"}
     date_list = date_text.split(" ")
     month_key = date_list[0].replace("notAfter=", "").lower()
     try:
@@ -200,8 +200,8 @@ def parse_info_cer(info):
         IC, ICN, IO = "", "", "" 
 
     return {"c": subject_values.get("C", ""), 
-            "o": subject_values["O"], 
-            "cn": subject_values["CN"], 
+            "o": subject_values.get("O", ""), 
+            "cn": subject_values.get("CN", ""), 
             "dateend": convert_str2date(date_txt),
             "ic": IC, 
             "io": IO, 
@@ -303,6 +303,7 @@ def convert_nomina2xml(excel_path, name, cer, key, password, fecha_pago, periodi
         #"PRESTAMO A CORTO O MEDIANO PLAZO": "",
         u"N\xdaMERO DE D\xcdAS": "num_dias_pagados",
         "CUENTA CLABE": "clabe",
+        "PRESTAMO A CORTO O MEDIANO PLAZO": "prestamo_conteo"
         #"Neto a Pagar": "percepcion_total_gravado"
     }
 
@@ -315,6 +316,7 @@ def convert_nomina2xml(excel_path, name, cer, key, password, fecha_pago, periodi
         catalogo_percepciones = {k: v.replace(" ", "<SP>") for k, v in catalogo_percepciones.items()}
         catalogo_deducciones = {k: v.replace(" ", "<SP>") for k, v in catalogo_deducciones.items()}
         convert_name_fn = lambda x: x.replace(" ", "<SP>")
+        #if claves[column] == "003a":
     else:
         conceptos = {c: c for c in columns}
         convert_name_fn = lambda x: x
@@ -336,8 +338,18 @@ def convert_nomina2xml(excel_path, name, cer, key, password, fecha_pago, periodi
                 percepciones_column = False
             elif len(claves[column]) > 0 and claves[column] != "Total":
                 if row[column] != 0:
+                    if claves[column] == "003a":
+                        if f_type == "macro" and len(user_xml_data.data_template["prestamo_conteo"]) > 0:
+                            concepto = conceptos[column] + "<SP>" +\
+                            user_xml_data.data_template["prestamo_conteo"]
+                            #print(concepto)
+                        else:
+                            concepto = conceptos[column] + " " +\
+                            user_xml_data.data_template["prestamo_conteo"]
+                    else:
+                        concepto = conceptos[column]
                     user_xml_data.add_deducciones({"clave": claves[column], 
-                        "concepto": conceptos[column], "importe_gravado": row[column], 
+                        "concepto": concepto, "importe_gravado": row[column], 
                         "importe_exento": 0.000000, "tipo": str(tipo[column]).zfill(3),
                         "tipo_text": catalogo_deducciones[claves[column]]})
             else:

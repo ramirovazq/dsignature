@@ -424,7 +424,8 @@ class UserXMLData(object):
             #"clave_presupuestal": None, ClavePresupuestal="{{ clave_presupuestal }}"
             "percepciones": [],
             "deducciones": [],
-            "certificado": ""
+            "certificado": "",
+            "prestamo_conteo": ""
         }
         self.fecha_pago = fecha_pago
         self.tz = pytz.timezone(tz)

@@ -51,7 +51,7 @@ class Command(BaseCommand):
         if not os.path.exists(url):
             os.makedirs(url)
 
-        counter = 0
+        counter = 1
         for rfc, xml in xmls:
             with codecs.open(os.path.join(url, "{}.{}".format(rfc, types[f_type])), "wb", "utf-8") as f:
                 f.write(xml)
