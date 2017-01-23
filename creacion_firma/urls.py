@@ -27,5 +27,5 @@ urlpatterns = [
         name="resultados_subir_nomina"), 
     url(r'^login/$', creacion_firma.login, name="login"),
 
-    url(r'^test_rest/$', creacion_firma.test_rest, name="test_rest"),
+    url(r'^api_sign/$', creacion_firma.DigitalSignAPI.as_view(), name="api_sign"),
 ]

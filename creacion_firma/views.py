@@ -561,44 +561,23 @@ def resultados_subir_nomina(request):
         })
 
 
-#from django.http import HttpResponse
-from django.views.decorators.csrf import csrf_exempt
-from rest_framework.renderers import JSONRenderer
-from rest_framework.parsers import JSONParser
-#from snippets.models import Snippet
-from creacion_firma.serializers import DigitalFirmSerializer
-from rest_framework.decorators import api_view
+from creacion_firma.serializers import DigitalSignSerializer
 from rest_framework import status
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 
-@api_view(['GET', 'POST'])
-def test_rest(request):
-    if request.method == 'GET':
+class DigitalSignAPI(APIView):
+    
+    def get(self, request, format=None):
         return Response({"status": "ok"})
 
-    elif request.method == 'POST':
-        serializer = DigitalFirmSerializer(data=request.data)
+    def post(self, request, format=None):
+        serializer = DigitalSignSerializer(data=request.data)
         if serializer.is_valid():
             result = serializer.save()
             if result is True:
                 return Response({"status": "ok"}, status=status.HTTP_201_CREATED)
             else:
                 return Response({"error": result}, status=status.HTTP_400_BAD_REQUEST) 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-from rest_framework.views import APIView
-
-
-class TestRest(APIView):
-    
-    def get(self, request, format=None):
-        return Response({"status": "ok"})
-
-    def post(self, request, format=None):
-        serializer = DigitalFirmSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({"status": "ok"}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

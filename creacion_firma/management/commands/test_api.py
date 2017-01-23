@@ -13,5 +13,5 @@ class Command(BaseCommand):
         with open(key, "rb") as key_f:
             key_encoded = base64.b64encode(key_f.read())
         
-        r = requests.post("http://127.0.0.1:8000/test_rest/", 
+        r = requests.post("http://127.0.0.1:8000/api_sign/", 
             json={'passwd': '12345678a', 'cer': cer_encoded, 'key': key_encoded})
