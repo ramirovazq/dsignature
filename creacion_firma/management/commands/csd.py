@@ -19,8 +19,8 @@ class Command(BaseCommand):
         self.csd(password, type_ocsp)
         
     def csd(self, password, type_ocsp):
-        cer = "/home/agmartinez/csd_test/Cert_Sellos/Cert_Sellos/aaa010101aaa_FIEL.cer"
-        key = "/home/agmartinez/csd_test/Cert_Sellos/Cert_Sellos/AAA010101AAA_FIEL.key"
+        cer = "/home/agmartinez/csd_test/Cert_Sellos/Cert_Sellos/CSD01_AAA010101AAA.cer"
+        key = "/home/agmartinez/csd_test/Cert_Sellos/Cert_Sellos/CSD01_AAA010101AAA.key"
         cer_f = open(cer, "rb")
         key_f = open(key, "rb")
         digital_sign = CSD(cer=cer_f, key=key_f, test=type_ocsp == "test")
@@ -29,6 +29,7 @@ class Command(BaseCommand):
         print(digital_sign.get_info_cer()["o"])
         number = digital_sign.get_ocsp_origin()
         OCSP_NUMBER = "C"+number
+        print("ORIGINAL", OCSP_NUMBER)
         if type_ocsp == "test":
             OCSP_NUMBER = "C0"
         print(OCSP_NUMBER)

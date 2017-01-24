@@ -371,9 +371,9 @@ class CSD(DigitalSign):
         elif not self.is_valid_ca_cer(chain_cer) and self.test is False:
             self.clean()
             return "", "SIGN", "El certificado no corresponde a la cadena de certificados"
-        #elif not self.cert_is_valid(issuer_cer_path, ocsp_cer):
-        #    self.clean()
-        #    return "", "SIGN", "El certificado no es válido por el ocsp"
+        elif not self.cert_is_valid(issuer_cer_path, ocsp_cer) and self.test is False:
+            self.clean()
+            return "", "SIGN", "El certificado no es válido por el ocsp"
 
         self.files["sign"]["digest"] = tmp_dir_o_file+id_generator(size=SIZE_NAME)
         self.files["sign"]["base64"] = tmp_dir_o_file+id_generator(size=SIZE_NAME)

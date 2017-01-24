@@ -14,6 +14,11 @@ from creacion_firma.models import TransactionStatus, NominaSubida
 from creacion_firma.utils import id_generator, save_file, parse_info_cer, clean
 from creacion_firma.classes import DigitalSign
 
+from creacion_firma.serializers import DigitalSignSerializer
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
 import shlex
 import logging
 import zipfile
@@ -559,12 +564,6 @@ def resultados_subir_nomina(request):
         "xml_no_pdf": xml_no_pdf,
         "sin_curp_intranet": sin_curp_intranet
         })
-
-
-from creacion_firma.serializers import DigitalSignSerializer
-from rest_framework import status
-from rest_framework.response import Response
-from rest_framework.views import APIView
 
 
 class DigitalSignAPI(APIView):
