@@ -29,6 +29,8 @@ class Command(BaseCommand):
         print(digital_sign.get_info_cer()["o"])
         number = digital_sign.get_ocsp_origin()
         OCSP_NUMBER = "C"+number
+        if type_ocsp == "test":
+            OCSP_NUMBER = "C0"
         print(OCSP_NUMBER)
         print(digital_sign.sign(
             #"/home/agmartinez/csd_test/test_sello.xml",

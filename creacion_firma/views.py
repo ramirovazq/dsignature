@@ -576,8 +576,8 @@ class DigitalSignAPI(APIView):
         serializer = DigitalSignSerializer(data=request.data)
         if serializer.is_valid():
             result = serializer.save()
-            if result is True:
-                return Response({"status": "ok"}, status=status.HTTP_201_CREATED)
+            if result["status"] == "ok":
+                return Response(result, status=status.HTTP_201_CREATED)
             else:
-                return Response({"error": result}, status=status.HTTP_400_BAD_REQUEST) 
+                return Response(result, status=status.HTTP_400_BAD_REQUEST) 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

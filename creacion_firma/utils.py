@@ -215,7 +215,7 @@ def clean(files):
     for filename in files:
         call(["rm", filename])
 
-def create_docs_test(curp, path):
+def create_docs_test(curp, path, number_user, username):
     from creacion_firma.models import User, UserDocumentSign, TransactionStatus
     call(["mkdir", path])
     SIZE_NAME = 30
@@ -223,7 +223,11 @@ def create_docs_test(curp, path):
     with open(n_xml_file, 'wb') as f:
         f.write("TEST")
 
-    user, _ = User.objects.get_or_create(curp=curp, number_user=155)
+    user, _ = User.objects.get_or_create(
+        curp=curp, 
+        defaults={
+        "number_user": number_user, 
+        "username": username})
     transaction = TransactionStatus.objects.create(status="created")
     transaction_number = transaction.fecha.strftime("%Y%m%d") + "_" + str(transaction.id)
 

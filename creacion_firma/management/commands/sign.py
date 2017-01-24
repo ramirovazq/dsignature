@@ -22,7 +22,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         type_ocsp = options.get('type', "production")
         password = options.get('password', "")
-        #if type_ocsp == "test":
         self.sign(password, type_ocsp)
         
     def sign(self, password, type_ocsp):
@@ -32,9 +31,14 @@ class Command(BaseCommand):
         call(["mkdir", tmp_dir_o_file])
         call(["mkdir", tmp_dir_pkcs7_file])
         call(["mkdir", tmp_dir_pkcs7_file_date])
-        user_document_sign = create_docs_test("MARA800822HDFRML00", tmp_dir_o_file)
-        cer = "/home/agmartinez/Documentos/FIEL 2013/FIEL_MARA800822JQ4_20130523120921/mara800822jq4.cer"
-        key = "/home/agmartinez/Documentos/FIEL 2013/FIEL_MARA800822JQ4_20130523120921/Claveprivada_FIEL_MARA800822JQ4_20130523_120921.key"
+        if type_ocsp == "test":
+            user_document_sign = create_docs_test("PXXD941105MDFCZL09", tmp_dir_o_file, 1000, "test")
+            cer = "/home/agmartinez/ocsp_3_uat/1024-v2/aimr770903ri4.cer"
+            key = "/home/agmartinez/ocsp_3_uat/1024-v2/AIMR770903RI4.key"
+        else:
+            user_document_sign = create_docs_test("MARA800822HDFRML00", tmp_dir_o_file, 155, "agmartinez")
+            cer = "/home/agmartinez/Documentos/FIEL 2013/FIEL_MARA800822JQ4_20130523120921/mara800822jq4.cer"
+            key = "/home/agmartinez/Documentos/FIEL 2013/FIEL_MARA800822JQ4_20130523120921/Claveprivada_FIEL_MARA800822JQ4_20130523_120921.key"
         cer_f = open(cer, "rb")
         key_f = open(key, "rb")
         digital_sign = DigitalSign(cer=cer_f, key=key_f, test=type_ocsp == "test")
@@ -43,6 +47,8 @@ class Command(BaseCommand):
         print(digital_sign.get_info_cer()["o"])
         number = digital_sign.get_ocsp_origin()
         OCSP_NUMBER = "C"+number
+        if type_ocsp == "test":
+            OCSP_NUMBER = "C0"
         print(digital_sign.sign(
             tmp_dir_pkcs7_file_date, 
             user_document_sign, 

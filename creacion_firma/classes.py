@@ -217,7 +217,7 @@ class DigitalSign(object):
             return error, "PEM", "La contraseña es incorrecta"
         if documento.user.curp != data_info["curp"]:
             self.clean()
-            return "", "CURP", "El CURP del certificado no corresponde al registrado en el sistema"
+            return "", "CURP", "El CURP del certificado '{}' no corresponde al registrado en el sistema".format(data_info["curp"])
         elif data_info["dateend"] < datetime.datetime.today():
             self.clean()
             return "", "SIGN", "El certificado ha expirado"
@@ -230,7 +230,6 @@ class DigitalSign(object):
         elif not self.is_valid_ca_cer(chain_cer):
             self.clean()
             return "", "SIGN", "El certificado no corresponde a la cadena de certificados"
-        #if not self.test: 
         elif not self.cert_is_valid(issuer_cer_path, ocsp_cer):
             self.clean()
             return "", "SIGN", "El certificado no es válido por el ocsp"
@@ -259,7 +258,6 @@ class DigitalSign(object):
 
     @run
     def __verify(self, documento_url):
-        print(self.files)
         command = "openssl smime -verify -in {pkcs7} -inform DER -content {file_check} -signer {cer} -noverify".format(
             pkcs7=self.files["sign"]["pkcs7"],
             cer=self.files["cer"]["pem"],
@@ -275,7 +273,6 @@ class DigitalSign(object):
         self.files["sign"]["o_string"] = tmp_dir_o_file+id_generator(size=SIZE_NAME)
         command = "xsltproc {} {} --noout --output {}".format(
             settings.XSLT, xml_filename, self.files["sign"]["o_string"])
-        #print(command)
         return command
 
     def original_string(self, xml_filename):
@@ -361,6 +358,7 @@ class CSD(DigitalSign):
         VALID_CERT = ["O=Servicio de Administraci\\xC3\\xB3n Tributaria", "O=Inmegen", "0=Test CA"]
         data_info = self.get_info_cer()
         error = self.key2pem(password)
+
         if error:
             self.clean()
             return error, "PEM", "La contraseña es incorrecta"
@@ -370,9 +368,9 @@ class CSD(DigitalSign):
         elif not self.key_match_cer():
             self.clean()
             return "", "SIGN", "El certificado no corresponde a la llave"
-        #elif not self.is_valid_ca_cer(chain_cer):
-        #    self.clean()
-        #    return "", "SIGN", "El certificado no corresponde a la cadena de certificados"
+        elif not self.is_valid_ca_cer(chain_cer) and self.test is False:
+            self.clean()
+            return "", "SIGN", "El certificado no corresponde a la cadena de certificados"
         #elif not self.cert_is_valid(issuer_cer_path, ocsp_cer):
         #    self.clean()
         #    return "", "SIGN", "El certificado no es válido por el ocsp"
@@ -383,14 +381,47 @@ class CSD(DigitalSign):
         self.digest_binary(self.files["sign"]["o_string"], self.files["sign"]["digest"])
         self.base64(self.files["sign"]["digest"], self.files["sign"]["base64"])
 
-        #with open(self.files["sign"]["o_string"], 'rb') as f:
-        #    print(f.read())
 
-        #with open(self.files["sign"]["digest"], 'rb') as f:
-        #    print(f.read())
+class GenericDigitalSign(DigitalSign):
+    def __init__(self, *args, **kwargs):
+        super(GenericDigitalSign, self).__init__(*args, **kwargs)
+        self.files["sign"] = {"digest": None, "base64": None, "o_string": None, "sello": None}
 
-        #with open(self.files["sign"]["base64"], 'rb') as f:
-        #    return f.read()
+    def sign(self, documento, password, issuer_cer_path, ocsp_cer, chain_cer):
+        VALID_CERT = ["O=Servicio de Administraci\\xC3\\xB3n Tributaria", "O=Inmegen", "0=Test CA"]
+        data_info = self.get_info_cer()
+        error = self.key2pem(password)
+
+        if error:
+            self.clean()
+            return error, "PEM", "La contraseña es incorrecta"
+        elif not data_info["io"] in VALID_CERT:
+            self.clean()
+            return "", "SIGN", "El firmante del certificado no es válido"
+        elif not self.key_match_cer():
+            self.clean()
+            return "", "SIGN", "El certificado no corresponde a la llave"
+        elif not self.is_valid_ca_cer(chain_cer) and self.test is False:
+            self.clean()
+            return "", "SIGN", "El certificado no corresponde a la cadena de certificados"
+        elif not self.cert_is_valid(issuer_cer_path, ocsp_cer):
+            self.clean()
+            return "", "SIGN", "El certificado no es válido por el ocsp"
+
+        self.files["sign"]["digest"] = tmp_dir_o_file+id_generator(size=SIZE_NAME)
+        self.files["sign"]["base64"] = tmp_dir_o_file+id_generator(size=SIZE_NAME)
+        self.original_string(documento)
+        self.digest_binary(self.files["sign"]["o_string"], self.files["sign"]["digest"])
+        self.base64(self.files["sign"]["digest"], self.files["sign"]["base64"])
+
+    def original_string(self, document):
+        """
+        Define the elements of the document you want to sign. In this case is all document.
+        If you only want to sign a determinated number of data, first read the file, and put
+        in a file these data, then pass the file path to o_string.
+        """
+        self.files["sign"]["o_string"] = document
+
 
 class UserXMLData(object):
     def __init__(self, nombre_nomina, fecha_pago, folio, tz='America/Mexico_City'):
